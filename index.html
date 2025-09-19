@@ -193,7 +193,6 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             border-left: 4px solid var(--peron-blue);
-            cursor: pointer;
         }
         
         .day-card:hover {
@@ -212,13 +211,6 @@
             color: #666;
             margin-bottom: 10px;
             font-weight: bold;
-        }
-        
-        .day-title {
-            font-weight: bold;
-            color: var(--peron-blue);
-            margin-bottom: 12px;
-            font-size: 1.2rem;
         }
         
         .day-description {
@@ -405,46 +397,49 @@
     </div>
 
     <script>
-        // Datos de ejemplo (reemplazar con carga desde CSV)
-        const efemeridesData = [
-            {
-                fecha: "01-01",
-                reseña: "1945- Por iniciativa de la Secretaría de Trabajo y Previsión a cargo del Coronel Juan Perón, se amplía la jubilación obligatoria para todos los trabajadores en relación de dependencia.\n1947- Inicio del primer Plan Quinquenal.\n1950- Año del Libertador General San Martín.\n1952- Comienza el año, pasando a poder del Estado la ex Corporación de Transportes de la Ciudad de Buenos Aires.\n1956- Desde Colón (Panamá) Perón establece el primer contacto con la Resistencia y envía instrucciones reservadas.\n1998- Año de los Municipios.\n1999- Año de la Exportación."
-            },
-            {
-                fecha: "02-01",
-                reseña: "1949- El Papa Pío XII escribía un mensaje a la señora Eva Perón, bendiciéndola y elogiando 'la caritativa creación e invocando las gracias celestiales sobre su Institución de Ayuda Social, y la labor que realiza'."
-            },
-            {
-                fecha: "05-01",
-                reseña: "1950- Por decisión del gobierno es otorgado (por intermedio del Banco de Crédito Industrial) un crédito de 15 millones para la fabricación de maquinaria agrícola."
-            },
-            {
-                fecha: "17-10",
-                reseña: "1945- Día de la Lealtad Peronista. Una gran movilización obrera y sindical exige la liberación del Coronel Juan Domingo Perón, quien había sido detenido por el gobierno de facto. Este evento marca el nacimiento del movimiento peronista."
-            },
-            {
-                fecha: "04-06",
-                reseña: "1943- La Revolución del 43 derroca al presidente Ramón Castillo. Un grupo de militares nacionalistas toma el poder, entre ellos el entonces coronel Juan Domingo Perón, quien comienza a destacarse desde la Secretaría de Trabajo y Previsión."
-            }
-        ];
-
-        // Función para mostrar la sección seleccionada
-        function showSection(sectionId) {
-            // Ocultar todas las secciones
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Mostrar la sección seleccionada
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Si es la sección de hoy, cargar la efeméride del día actual
-            if (sectionId === 'today') {
-                loadTodaysEfemeride();
-            }
+        // Función para cargar el CSV directamente
+        function loadCSV() {
+            fetch('data/efemerides.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    processCSVData(csvData);
+                })
+                .catch(error => {
+                    console.error('Error cargando el CSV:', error);
+                    document.getElementById('calendar-content').innerHTML = `
+                        <div class="loading">
+                            <i class="fas fa-exclamation-triangle"></i> Error al cargar el archivo CSV
+                        </div>
+                    `;
+                });
         }
-        
+
+        // Función para procesar los datos del CSV
+        function processCSVData(csvData) {
+            const lines = csvData.split('\n');
+            const efemeridesData = [];
+            
+            // Empezar desde 1 para saltar el encabezado
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line) {
+                    // Separar por la primera coma (formato: fecha,reseña)
+                    const firstCommaIndex = line.indexOf(',');
+                    if (firstCommaIndex > 0) {
+                        const fecha = line.substring(0, firstCommaIndex).trim();
+                        const reseña = line.substring(firstCommaIndex + 1).trim();
+                        
+                        // Limpiar las comillas si existen
+                        const reseñaLimpia = reseña.replace(/^"|"$/g, '');
+                        
+                        efemeridesData.push({ fecha, reseña: reseñaLimpia });
+                    }
+                }
+            }
+            
+            renderCalendar(efemeridesData);
+        }
+
         // Función para obtener el nombre del mes en español
         function getMonthName(monthIndex) {
             const months = [
@@ -470,7 +465,7 @@
         }
         
         // Función para renderizar el calendario
-        function renderCalendar() {
+        function renderCalendar(efemeridesData) {
             const calendarContent = document.getElementById('calendar-content');
             const calendarLoading = document.getElementById('calendar-loading');
             
@@ -513,7 +508,6 @@
                         calendarHTML += `
                             <div class="day-card ${isToday ? 'current' : ''}" data-fecha="${efemeride.fecha}">
                                 <div class="day-date">${dia} de ${getMonthName(mes)}</div>
-                                <div class="day-title">${titulo}</div>
                                 <div class="day-description">${efemeride.reseña.substring(0, 150)}...</div>
                             </div>
                         `;
@@ -573,22 +567,72 @@
             `;
         }
         
+        // Función para mostrar la sección seleccionada
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Si es la sección de hoy, cargar la efeméride del día actual
+            if (sectionId === 'today') {
+                loadTodaysEfemeride();
+            }
+        }
+        
         // Función para cargar la efeméride del día actual
         function loadTodaysEfemeride() {
-            const today = new Date();
-            const todayFormatted = formatDate(today);
-            
-            // Buscar la efeméride de hoy
-            const todaysEfemeride = efemeridesData.find(efemeride => efemeride.fecha === todayFormatted);
-            
-            if (todaysEfemeride) {
-                showEfemerideDetail(todaysEfemeride);
-            } else {
-                document.getElementById('today-title').textContent = 'No hay efemérides para hoy';
-                document.getElementById('today-date').textContent = formatDate(today);
-                document.getElementById('today-text').innerHTML = '<p>No se encontraron efemérides para la fecha de hoy.</p>';
-                document.getElementById('today-image').innerHTML = 'Imagen no disponible';
-            }
+            // Necesitamos cargar el CSV otra vez para obtener los datos
+            fetch('data/efemerides.csv')
+                .then(response => response.text())
+                .then(csvData => {
+                    const lines = csvData.split('\n');
+                    const today = new Date();
+                    const todayFormatted = formatDate(today);
+                    
+                    // Buscar la efeméride de hoy
+                    for (let i = 1; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line) {
+                            const firstCommaIndex = line.indexOf(',');
+                            if (firstCommaIndex > 0) {
+                                const fecha = line.substring(0, firstCommaIndex).trim();
+                                if (fecha === todayFormatted) {
+                                    const reseña = line.substring(firstCommaIndex + 1).trim();
+                                    const reseñaLimpia = reseña.replace(/^"|"$/g, '');
+                                    
+                                    // Actualizar el contenido
+                                    const titulo = extractTitle(reseñaLimpia);
+                                    document.getElementById('today-title').textContent = titulo;
+                                    
+                                    const [day, month] = fecha.split('-');
+                                    document.getElementById('today-date').textContent = `${day} de ${getMonthName(parseInt(month) - 1)}`;
+                                    
+                                    // Formatear la reseña con saltos de línea
+                                    const reseñaFormateada = reseñaLimpia.split('\n')
+                                        .map(paragraph => `<p>${paragraph}</p>`)
+                                        .join('');
+                                        
+                                    document.getElementById('today-text').innerHTML = reseñaFormateada;
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Si no encontró efeméride para hoy
+                    document.getElementById('today-title').textContent = 'No hay efemérides para hoy';
+                    document.getElementById('today-date').textContent = formatDate(today);
+                    document.getElementById('today-text').innerHTML = '<p>No se encontraron efemérides para la fecha de hoy.</p>';
+                })
+                .catch(error => {
+                    console.error('Error cargando el CSV:', error);
+                    document.getElementById('today-title').textContent = 'Error al cargar datos';
+                    document.getElementById('today-text').innerHTML = '<p>Ocurrió un error al cargar los datos. Por favor, intenta nuevamente.</p>';
+                });
         }
         
         // Inicializar la aplicación cuando el DOM esté cargado
@@ -597,12 +641,9 @@
             document.getElementById('btn-calendar').addEventListener('click', () => showSection('calendar'));
             document.getElementById('btn-today').addEventListener('click', () => showSection('today'));
             
-            // Renderizar el calendario
-            renderCalendar();
+            // Cargar el CSV y renderizar el calendario
+            loadCSV();
         });
-
-        // NOTA: Para cargar desde un CSV real, puedes usar la biblioteca PapaParse
-        // y reemplazar los datos de ejemplo con una llamada a Papa.parse('ruta/al/archivo.csv', ...)
     </script>
 </body>
 </html>

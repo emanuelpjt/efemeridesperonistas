@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efemérides Peronistas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --peron-blue: #005CAB;
+            --peron-yellow: #FEDE00;
+            --peron-white: #FFFFFF;
+            --peron-gray: #333333;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--peron-blue) 0%, #003A6F 100%);
+            color: var(--peron-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: var(--peron-blue);
+            color: var(--peron-white);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 5px solid var(--peron-yellow);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: var(--peron-yellow);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            color: var(--peron-blue);
+        }
+        
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            color: var(--peron-white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-style: italic;
+            color: var(--peron-yellow);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .intro-section {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .intro-text {
+            flex: 2;
+            padding: 25px;
+            min-width: 300px;
+        }
+        
+        .intro-image {
+            flex: 1;
+            min-width: 250px;
+            background: linear-gradient(rgba(0, 92, 171, 0.7), rgba(0, 92, 171, 0.7));
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            padding: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .main-button {
+            background: var(--peron-blue);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .main-button:hover {
+            background: #00458a;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .main-button.yellow {
+            background: var(--peron-yellow);
+            color: var(--peron-gray);
+        }
+        
+        .main-button.yellow:hover {
+            background: #e6c900;
+        }
+        
+        .section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .month-section {
+            margin-bottom: 40px;
+        }
+        
+        .month-title {
+            color: var(--peron-blue);
+            margin: 20px 0;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--peron-yellow);
+            padding-bottom: 10px;
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .day-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--peron-blue);
+            cursor: pointer;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-left: 4px solid var(--peron-yellow);
+        }
+        
+        .day-card.current {
+            background: var(--peron-yellow);
+            font-weight: bold;
+        }
+        
+        .day-date {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .day-title {
+            font-weight: bold;
+            color: var(--peron-blue);
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+        
+        .day-description {
+            color: #444;
+            line-height: 1.5;
+        }
+        
+        .today-efemeride {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-left: 5px solid var(--peron-yellow);
+        }
+        
+        .today-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--peron-blue);
+            padding-bottom: 10px;
+        }
+        
+        .today-title {
+            color: var(--peron-blue);
+            font-size: 1.8rem;
+        }
+        
+        .today-date {
+            color: #666;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        
+        .today-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .today-text {
+            flex: 2;
+            min-width: 300px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .today-image {
+            flex: 1;
+            min-width: 250px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: var(--peron-gray);
+            color: white;
+            font-size: 0.9rem;
+            margin-top: 30px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-container {
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .main-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .calendar {
+                grid-template-columns: 1fr;
+            }
+            
+            .today-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo">PJ</div>
+                <div class="logo">Perón & Evita</div>
+            </div>
+            <div class="header-title">
+                <h1>Efemérides Peronistas</h1>
+                <p class="subtitle">La historia del movimiento popular</p>
+            </div>
+        </header>
+        
+        <div class="content">
+            <section class="intro-section">
+                <div class="intro-text">
+                    <h2>¿Qué es el Peronismo?</h2>
+                    <p>El peronismo es un movimiento político y social surgido en Argentina a mediados del siglo XX de la mano de Juan Domingo Perón y Eva Duarte de Perón. Se caracteriza por su doctrina de justicia social, independencia económica y soberanía política, conocida como las "tres banderas".</p>
+                    <p>El peronismo representa los ideales de redistribución de la riqueza, derechos para los trabajadores y la reivindicación de los sectores más humildes de la sociedad.</p>
+                </div>
+                <div class="intro-image">
+                    <div>
+                        <p>"Los derechos no se mendigan, se conquistan"</p>
+                        <p>- Juan Domingo Perón</p>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="buttons-container">
+                <button class="main-button" id="btn-calendar">
+                    <i class="fas fa-calendar-alt"></i> Ver Calendario
+                </button>
+                <button class="main-button yellow" id="btn-today">
+                    <i class="fas fa-star"></i> Efeméride de Hoy
+                </button>
+            </div>
+            
+            <section id="calendar" class="section active">
+                <div class="loading" id="calendar-loading">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando efemérides...
+                </div>
+                <div id="calendar-content" style="display: none;">
+                    <!-- El calendario se cargará aquí con JavaScript -->
+                </div>
+            </section>
+            
+            <section id="today" class="section">
+                <div class="today-efemeride">
+                    <div class="today-header">
+                        <h2 class="today-title" id="today-title">Cargando...</h2>
+                        <div class="today-date" id="today-date"></div>
+                    </div>
+                    <div class="today-content">
+                        <div class="today-text" id="today-text">
+                            <p>Cargando efeméride del día...</p>
+                        </div>
+                        <div class="today-image" id="today-image">
+                            Imagen de la efeméride
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>Efemérides Peronistas - Honrando nuestra historia y construyendo futuro</p>
+            <p>© 2023 - Movimiento Nacional Peronista</p>
+        </footer>
+    </div>
+
+    <script>
+        // Datos de ejemplo (reemplazar con carga desde CSV)
+        const efemeridesData = [
+            {
+                fecha: "01-01",
+                reseña: "1945- Por iniciativa de la Secretaría de Trabajo y Previsión a cargo del Coronel Juan Perón, se amplía la jubilación obligatoria para todos los trabajadores en relación de dependencia.\n1947- Inicio del primer Plan Quinquenal.\n1950- Año del Libertador General San Martín.\n1952- Comienza el año, pasando a poder del Estado la ex Corporación de Transportes de la Ciudad de Buenos Aires.\n1956- Desde Colón (Panamá) Perón establece el primer contacto con la Resistencia y envía instrucciones reservadas.\n1998- Año de los Municipios.\n1999- Año de la Exportación."
+            },
+            {
+                fecha: "02-01",
+                reseña: "1949- El Papa Pío XII escribía un mensaje a la señora Eva Perón, bendiciéndola y elogiando 'la caritativa creación e invocando las gracias celestiales sobre su Institución de Ayuda Social, y la labor que realiza'."
+            },
+            {
+                fecha: "05-01",
+                reseña: "1950- Por decisión del gobierno es otorgado (por intermedio del Banco de Crédito Industrial) un crédito de 15 millones para la fabricación de maquinaria agrícola."
+            },
+            {
+                fecha: "17-10",
+                reseña: "1945- Día de la Lealtad Peronista. Una gran movilización obrera y sindical exige la liberación del Coronel Juan Domingo Perón, quien había sido detenido por el gobierno de facto. Este evento marca el nacimiento del movimiento peronista."
+            },
+            {
+                fecha: "04-06",
+                reseña: "1943- La Revolución del 43 derroca al presidente Ramón Castillo. Un grupo de militares nacionalistas toma el poder, entre ellos el entonces coronel Juan Domingo Perón, quien comienza a destacarse desde la Secretaría de Trabajo y Previsión."
+            }
+        ];
+
+        // Función para mostrar la sección seleccionada
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Si es la sección de hoy, cargar la efeméride del día actual
+            if (sectionId === 'today') {
+                loadTodaysEfemeride();
+            }
+        }
+        
+        // Función para obtener el nombre del mes en español
+        function getMonthName(monthIndex) {
+            const months = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            return months[monthIndex];
+        }
+        
+        // Función para formatear fecha como dd-mm
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${day}-${month}`;
+        }
+        
+        // Función para extraer el título de la reseña (primera línea)
+        function extractTitle(resena) {
+            // Tomar la primera línea y limitar a 5 palabras como título
+            const firstLine = resena.split('\n')[0];
+            const words = firstLine.split(' ');
+            return words.slice(0, 5).join(' ') + (words.length > 5 ? '...' : '');
+        }
+        
+        // Función para renderizar el calendario
+        function renderCalendar() {
+            const calendarContent = document.getElementById('calendar-content');
+            const calendarLoading = document.getElementById('calendar-loading');
+            
+            // Organizar efemérides por mes
+            const efemeridesPorMes = {};
+            efemeridesData.forEach(efemeride => {
+                const mes = parseInt(efemeride.fecha.split('-')[1]) - 1; // 0-11
+                if (!efemeridesPorMes[mes]) {
+                    efemeridesPorMes[mes] = [];
+                }
+                efemeridesPorMes[mes].push(efemeride);
+            });
+            
+            // Obtener la fecha actual
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+            
+            // Generar HTML para cada mes
+            let calendarHTML = '';
+            
+            for (let mes = 0; mes < 12; mes++) {
+                if (efemeridesPorMes[mes] && efemeridesPorMes[mes].length > 0) {
+                    calendarHTML += `
+                        <div class="month-section">
+                            <h2 class="month-title">${getMonthName(mes)}</h2>
+                            <div class="calendar">
+                    `;
+                    
+                    // Ordenar efemérides por día
+                    efemeridesPorMes[mes].sort((a, b) => {
+                        return parseInt(a.fecha.split('-')[0]) - parseInt(b.fecha.split('-')[0]);
+                    });
+                    
+                    // Agregar cada efeméride
+                    efemeridesPorMes[mes].forEach(efemeride => {
+                        const isToday = efemeride.fecha === todayFormatted;
+                        const dia = efemeride.fecha.split('-')[0];
+                        const titulo = extractTitle(efemeride.reseña);
+                        
+                        calendarHTML += `
+                            <div class="day-card ${isToday ? 'current' : ''}" data-fecha="${efemeride.fecha}">
+                                <div class="day-date">${dia} de ${getMonthName(mes)}</div>
+                                <div class="day-title">${titulo}</div>
+                                <div class="day-description">${efemeride.reseña.substring(0, 150)}...</div>
+                            </div>
+                        `;
+                    });
+                    
+                    calendarHTML += `
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            calendarContent.innerHTML = calendarHTML;
+            calendarLoading.style.display = 'none';
+            calendarContent.style.display = 'block';
+            
+            // Agregar event listeners a las tarjetas
+            document.querySelectorAll('.day-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const fecha = card.getAttribute('data-fecha');
+                    const efemeride = efemeridesData.find(e => e.fecha === fecha);
+                    if (efemeride) {
+                        showEfemerideDetail(efemeride);
+                    }
+                });
+            });
+        }
+        
+        // Función para mostrar el detalle de una efeméride
+        function showEfemerideDetail(efemeride) {
+            // Cambiar a la sección de hoy
+            showSection('today');
+            
+            // Actualizar el contenido
+            const titulo = extractTitle(efemeride.reseña);
+            document.getElementById('today-title').textContent = titulo;
+            
+            const [day, month] = efemeride.fecha.split('-');
+            document.getElementById('today-date').textContent = `${day} de ${getMonthName(parseInt(month) - 1)}`;
+            
+            // Formatear la reseña con saltos de línea
+            const reseñaFormateada = efemeride.reseña.split('\n')
+                .map(paragraph => `<p>${paragraph}</p>`)
+                .join('');
+                
+            document.getElementById('today-text').innerHTML = reseñaFormateada;
+            
+            // Intentar cargar imagen si existe
+            const imageContainer = document.getElementById('today-image');
+            const imageName = `${efemeride.fecha}.jpg`;
+            imageContainer.innerHTML = `
+                <div style="text-align: center;">
+                    <i class="fas fa-image" style="font-size: 3rem; margin-bottom: 10px;"></i>
+                    <p>Imagen ilustrativa</p>
+                    <p><small>${imageName}</small></p>
+                </div>
+            `;
+        }
+        
+        // Función para cargar la efeméride del día actual
+        function loadTodaysEfemeride() {
+            const today = new Date();
+            const todayFormatted = formatDate(today);
+            
+            // Buscar la efeméride de hoy
+            const todaysEfemeride = efemeridesData.find(efemeride => efemeride.fecha === todayFormatted);
+            
+            if (todaysEfemeride) {
+                showEfemerideDetail(todaysEfemeride);
+            } else {
+                document.getElementById('today-title').textContent = 'No hay efemérides para hoy';
+                document.getElementById('today-date').textContent = formatDate(today);
+                document.getElementById('today-text').innerHTML = '<p>No se encontraron efemérides para la fecha de hoy.</p>';
+                document.getElementById('today-image').innerHTML = 'Imagen no disponible';
+            }
+        }
+        
+        // Inicializar la aplicación cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar event listeners para los botones
+            document.getElementById('btn-calendar').addEventListener('click', () => showSection('calendar'));
+            document.getElementById('btn-today').addEventListener('click', () => showSection('today'));
+            
+            // Renderizar el calendario
+            renderCalendar();
+        });
+
+        // NOTA: Para cargar desde un CSV real, puedes usar la biblioteca PapaParse
+        // y reemplazar los datos de ejemplo con una llamada a Papa.parse('ruta/al/archivo.csv', ...)
+    </script>
+</body>
+</html>
